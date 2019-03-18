@@ -1,10 +1,9 @@
-from torch.utils import data
-import os
-from os.path import join, abspath, splitext, split, isdir, isfile
-from PIL import Image
-import numpy as np
-import cv2
+from os.path import join
 
+import cv2
+import numpy as np
+from PIL import Image
+from torch.utils import data
 
 
 def prepare_image_PIL(im):
@@ -12,6 +11,7 @@ def prepare_image_PIL(im):
     im -= np.array((104.00698793,116.66876762,122.67891434))
     im = np.transpose(im, (2, 0, 1)) # (H x W x C) to (C x H x W)
     return im
+
 
 def prepare_image_cv2(im):
     im -= np.array((104.00698793,116.66876762,122.67891434))
@@ -62,4 +62,3 @@ class BSDS_RCFLoader(data.Dataset):
             img = np.array(Image.open(join(self.root, img_file)), dtype=np.float32)
             img = prepare_image_PIL(img)
             return img
-

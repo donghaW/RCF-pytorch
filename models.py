@@ -1,12 +1,6 @@
-import os, sys
+import numpy as np
 import torch
 import torch.nn as nn
-import torchvision.models as models
-import torch.autograd.variable as Variable
-import numpy as np
-import scipy.io as sio
-from torch.nn.modules.conv import _ConvNd
-from torch.nn.modules.conv import _single, _pair, _triple
 import torch.nn.functional as F
 
 
@@ -24,6 +18,7 @@ class DilateConv(nn.Module):
 
     def forward(self, x):
         return self.d_conv(x)
+
 
 class RCF(nn.Module):
     def __init__(self):
@@ -183,6 +178,7 @@ def crop_caffe(location, variable, th, tw):
         y1 = int(location)
         return variable[:, :, y1 : y1 + th, x1 : x1 + tw]
 
+
 # make a bilinear interpolation kernel
 def upsample_filt(size):
     factor = (size + 1) // 2
@@ -193,6 +189,7 @@ def upsample_filt(size):
     og = np.ogrid[:size, :size]
     return (1 - abs(og[0] - center) / factor) * \
            (1 - abs(og[1] - center) / factor)
+
 
 # set parameters s.t. deconvolutional layers compute bilinear interpolation
 # N.B. this is for deconvolution without groups
@@ -205,6 +202,7 @@ def interp_surgery(in_channels, out_channels, h, w):
     filt = upsample_filt(h)
     weights[range(in_channels), range(out_channels), :, :] = filt
     return np.float32(weights)
+
 
 def make_bilinear_weights(size, num_channels):
     factor = (size + 1) // 2
@@ -223,6 +221,7 @@ def make_bilinear_weights(size, num_channels):
             if i == j:
                 w[i, j] = filt
     return w
+
 
 def upsample(input, stride, num_channels=1):
     kernel_size = stride * 2

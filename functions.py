@@ -1,8 +1,8 @@
-import numpy as np
 import torch
 from torch.optim.optimizer import Optimizer, required
-# loss function
 
+
+# loss function
 def cross_entropy_loss_RCF(prediction, label):
     label = label.long()
     mask = label.float()
@@ -15,6 +15,7 @@ def cross_entropy_loss_RCF(prediction, label):
     cost = torch.nn.functional.binary_cross_entropy(
             prediction.float(),label.float(), weight=mask, reduce=False)
     return torch.sum(cost)
+
 
 class SGD_caffe(Optimizer):
     r"""Implements stochastic gradient descent (optionally with momentum).

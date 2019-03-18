@@ -1,28 +1,27 @@
 #!/user/bin/python
 # coding=utf-8
-import os, sys
-import numpy as np
-from PIL import Image
-import cv2
-import shutil
 import argparse
+import os
+import sys
 import time
-import datetime
+
+import cv2
+import matplotlib
+import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from torch.optim import lr_scheduler
 import torchvision
-import torchvision.transforms as transforms
-import matplotlib
+from PIL import Image
+from torch.optim import lr_scheduler
+
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 from data_loader import BSDS_RCFLoader
 from models import RCF
-from functions import  cross_entropy_loss_RCF, SGD_caffe
-from torch.utils.data import DataLoader, sampler
+from functions import  cross_entropy_loss_RCF
+from torch.utils.data import DataLoader
 from utils import Logger, Averagvalue, save_checkpoint, load_vgg16pretrain
-from os.path import join, split, isdir, isfile, splitext, split, abspath, dirname
+from os.path import join, isdir, isfile, splitext, split, abspath, dirname
+
 
 parser = argparse.ArgumentParser(description='PyTorch Training')
 parser.add_argument('--batch_size', default=1, type=int, metavar='BT',
@@ -62,8 +61,10 @@ os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
 THIS_DIR = abspath(dirname(__file__))
 TMP_DIR = join(THIS_DIR, args.tmp)
 if not isdir(TMP_DIR):
-  os.makedirs(TMP_DIR)
+    os.makedirs(TMP_DIR)
 print('***', args.lr)
+
+
 def main():
     args.cuda = True
     # dataset
@@ -227,6 +228,7 @@ def main():
         train_loss.append(tr_avg_loss)
         train_loss_detail += tr_detail_loss
 
+
 def train(train_loader, model, optimizer, epoch, save_dir):
     batch_time = Averagvalue()
     data_time = Averagvalue()
@@ -281,6 +283,7 @@ def train(train_loader, model, optimizer, epoch, save_dir):
 
     return losses.avg, epoch_loss
 
+
 def test(model, test_loader, epoch, test_list, save_dir):
     model.eval()
     if not isdir(save_dir):
@@ -299,6 +302,8 @@ def test(model, test_loader, epoch, test_list, save_dir):
         result.save(join(save_dir, "%s.png" % filename))
         print("Running test [%d/%d]" % (idx + 1, len(test_loader)))
 # torch.nn.functional.upsample(input, size=None, scale_factor=None, mode='nearest', align_corners=None)
+
+
 def multiscale_test(model, test_loader, epoch, test_list, save_dir):
     model.eval()
     if not isdir(save_dir):
@@ -325,6 +330,7 @@ def multiscale_test(model, test_loader, epoch, test_list, save_dir):
         result_out_test = Image.fromarray((multi_fuse * 255).astype(np.uint8))
         result_out_test.save(join(save_dir, "%s.png" % filename))
         print("Running test [%d/%d]" % (idx + 1, len(test_loader)))
+
 
 def weights_init(m):
     if isinstance(m, nn.Conv2d):

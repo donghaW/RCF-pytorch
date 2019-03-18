@@ -1,19 +1,11 @@
-import os, sys
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torchvision.models as models
-import torch.autograd.variable as Variable
+import os
+import sys
+
 import numpy as np
 import scipy.io as sio
-from os.path import join as pjoin
-#from skimage.transform import resize
-#from models import HiFi1Edge
-import skimage.io as io
-import time
-import skimage
-import warnings
-from PIL import Image
+import torch
+import torch.nn as nn
+
 
 class Logger(object):
   def __init__(self, fpath=None):
@@ -47,6 +39,7 @@ class Logger(object):
     if self.file is not None:
         self.file.close()
 
+
 class Averagvalue(object):
     """Computes and stores the average and current value"""
 
@@ -65,8 +58,10 @@ class Averagvalue(object):
         self.count += n
         self.avg = self.sum / self.count
 
+
 def save_checkpoint(state, filename='checkpoint.pth'):
     torch.save(state, filename)
+
 
 def load_pretrained(model, fname, optimizer=None):
     """
@@ -86,6 +81,7 @@ def load_pretrained(model, fname, optimizer=None):
     else:
         print("=> no checkpoint found at '{}'".format(fname))
 
+
 def load_vgg16pretrain(model, vggmodel='vgg16convs.mat'):
     vgg16 = sio.loadmat(vggmodel)
     torch_params =  model.state_dict()
@@ -97,6 +93,7 @@ def load_vgg16pretrain(model, vggmodel='vgg16convs.mat'):
             data = np.squeeze(vgg16[k])
             torch_params[name_space] = torch.from_numpy(data)
     model.load_state_dict(torch_params)
+
 
 def load_vgg16pretrain_half(model, vggmodel='vgg16convs.mat'):
     vgg16 = sio.loadmat(vggmodel)
@@ -116,6 +113,7 @@ def load_vgg16pretrain_half(model, vggmodel='vgg16convs.mat'):
             torch_params[name_space] = torch.from_numpy(data)
     model.load_state_dict(torch_params)
 
+
 def load_fsds_caffe(model, fsdsmodel='caffe-fsds.mat'):
     fsds = sio.loadmat(fsdsmodel)
     torch_params =  model.state_dict()
@@ -126,11 +124,9 @@ def load_fsds_caffe(model, fsdsmodel='caffe-fsds.mat'):
 
         data = np.squeeze(fsds[k])
 
-
         if 'upsample' in name_par:
            # print('skip upsample')
             continue 
-
 
         if size  == 2:
             name_space = name_par[0] + '.' + name_par[1]
@@ -140,7 +136,7 @@ def load_fsds_caffe(model, fsdsmodel='caffe-fsds.mat'):
 
             torch_params[name_space] = torch.from_numpy(data)
 
-        if size  == 3:
+        if size == 3:
            # if 'bias' in name_par:
             #    continue
 
